@@ -1,0 +1,47 @@
+.LoginPanel {
+    background: #fff;
+    color: #000;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+    h2 {
+        text-align: center;
+        font-size: 32px;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        div {
+            width: 80%;
+            margin: 0px;
+            padding: 0px;
+            label {
+                float: left;
+                text-align: left;
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            input {
+                width: 100%;
+                margin-bottom: 10px;
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+            }
+        }
+    }
+    .LoginToggle {
+        margin-top: 10px;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        cursor: pointer;
+      
+    }
+}
