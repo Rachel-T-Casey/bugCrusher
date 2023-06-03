@@ -1,21 +1,36 @@
 const express = require('express');
 const app = express();
-const port = 5000;
+const dotenv = require('dotenv');
+const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/users/users');
+const limiter = require('./util/limiter');
+
+dotenv.config();
+const port = process.env.PORT;
+
 app.use(cors());    
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get('/', (req, res) => res.send('Hello World!'));
-
-app.use('/users', userRouter);
-
-
-
-app.post('/' , (req, res) => {
-    console.log(req.body);
-    res.send(req.body);
+app.use(limiter);
+const db = mysql.createConnection({ 
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    port: process.env.DB_PORT,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
+})
+db.connect((err) => {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log('Connected to database');
+    }
 });
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+app.listen(port, () => {
+    app.locals.db = db;
+    app.use('/users',  userRouter);
+
+});

@@ -4,8 +4,7 @@ import axios from 'axios';
 const RegisterForm = () => {
     const {register, handleSubmit} = useForm();
     const onSubmit = (data: any) => {
-        console.log(data);
-        axios.post('http://localhost:5000/Users/Register', data)
+        axios.post('http://localhost:5000/users/register/', data)
         .then(response => {
             console.log(response);
         }).catch(error => {
