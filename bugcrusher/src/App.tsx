@@ -3,7 +3,7 @@ import './styles/App.css';
 
 import LoginPanel from './components/authentication/LoginPanel';
 import MainRouter from './components/controllers/MainRouter';
-function App() {
+ function App() {
   return (
     <div className="App">
       <header className="App-header">

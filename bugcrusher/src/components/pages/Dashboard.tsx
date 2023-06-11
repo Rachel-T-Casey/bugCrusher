@@ -8,8 +8,7 @@ import "../../styles/Dashboard.scss";
 
 export default class Dashboard extends React.Component {
     constructor(props : any) {
-        super(props);
-
+        super(props);                               
     }
     componentDidMount(): void {
         validateAuthentication().then(res => {
@@ -25,7 +24,6 @@ export default class Dashboard extends React.Component {
         return (
             <div className = "Dashboard">
                 <DashboardMenu/>
-                <Feed/>
                 <Logout/>
             </div>
         )
