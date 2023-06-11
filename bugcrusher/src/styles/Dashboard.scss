@@ -9,21 +9,24 @@
         background-color: #fff;
         color: #000;
         .DashboardMenu__list {
-
+            background-color: #f00;
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: stretch;
+            align-items: stretch;
             padding: 0px;
             margin: 0px;
             list-style: none;
             .DashboardMenu__list__item {
-
-                height: 100%;
+                box-sizing: border-box;
+                display: flex;
+                align-items: stretch;
+                justify-content: stretch;
                 width: 25%; 
                 padding: 0px;
                 margin: 0px;
                 .DashboardMenu__button {
+
                     box-sizing: border-box;
                     background-color: #fff;
                     color: #000;
