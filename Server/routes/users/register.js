@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const registerRouter = express.Router();
- 
-
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const sql = require('mysql2');
 
 registerRouter.use(cors());
 registerRouter.use(express.json());
@@ -82,6 +82,8 @@ registerRouter.post('/', validateInputs, (req, res) => {
     const { Username, Email, Password } = req.body;
     const db = req.app.locals.db;
     const saltRounds = 10;
+    console.log("Registering");
+    console.log(Username, Email, Password);
     bcrypt.hash(Password, saltRounds, (err, Hash) => {
         if (err) {
             console.log(err);
@@ -90,7 +92,10 @@ registerRouter.post('/', validateInputs, (req, res) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    res.send(result);
+                    const token = jwt.sign({ id: result.insertId }, process.env.JWT_SECRET, {
+                        expiresIn: 86400 // expires in 24 hours
+                    });
+                    res.status(200).send({ auth: true, token: token });
                 }
             })
         }

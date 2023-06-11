@@ -1,0 +1,52 @@
+.Dashboard {
+    display: flex;
+    flex-direction: column;
+    background-color: #000;
+    border: none;
+    width: 100dvw;
+    height: 100dvh;
+    .DashboardMenu {
+        background-color: #fff;
+        color: #000;
+        .DashboardMenu__list {
+
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px;
+            margin: 0px;
+            list-style: none;
+            .DashboardMenu__list__item {
+
+                height: 100%;
+                width: 25%; 
+                padding: 0px;
+                margin: 0px;
+                .DashboardMenu__button {
+                    box-sizing: border-box;
+                    background-color: #fff;
+                    color: #000;
+                    border: none;
+                    padding: 10px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    height: 100%;
+                    width: 100%;
+                    &:hover {
+                        background-color: #ccc;
+                        border-left: 1px solid black;
+                        border-right: 1px solid black;
+                        border-top: 1px solid black;
+                        box-shadow: none;
+                    }
+                    &:active {
+                        background-color: #aaa;
+                    }
+                    
+                }
+            }
+        }
+    }
+}

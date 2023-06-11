@@ -3,15 +3,16 @@ import {useForm} from 'react-hook-form';
 import axios from 'axios';
 const RegisterForm = () => {
     const {register, handleSubmit} = useForm();
+
     const onSubmit = (data: any) => {
-        axios.post('http://localhost:5000/users/register/', data)
+        axios.post('http://localhost:5000/users/register', data)
         .then(response => {
-            console.log(response);
+            const token = response.data;
+            localStorage.setItem('x-auth-token', token);
         }).catch(error => {
             console.error(error);
         })
     }
-     
   return (
     <div> 
     <h2> Register </h2>
