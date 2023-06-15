@@ -1,0 +1,48 @@
+.ProjectItem {
+    background: #fff;
+    color: #000;
+    border-radius: 25px;
+    padding: 10px;
+    width: 20em;
+}
+.ProjectItemHeader {
+    border: none;
+    background: none;
+    color: #00f;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+}
+.ProjectItemHeader:hover {
+    color: #000;
+    cursor: pointer;
+}
+.ProjectItemDescription {
+    background: #eee;
+    border-radius: 5px;
+    padding: 1em;
+}
+.ProjectItemEdit, .ProjectItemAuthor, .ProjectItemDelete{
+    background: none;
+    border: 1px solid black;
+    border-radius: 5px;
+    color: #333;
+    font-size: 1em;
+    font-weight: bold;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    margin: 0.25em;
+}
+.ProjectItemEdit:hover, .ProjectItemAuthor:hover {
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+}
+.ProjectItemDelete:hover {
+    background: #f00;
+    color: #fff;
+    cursor: pointer;
+}
