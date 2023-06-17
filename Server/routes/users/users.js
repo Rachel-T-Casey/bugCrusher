@@ -8,11 +8,12 @@ userRouter.use(express.urlencoded({ extended: true }));
 
 const loginRouter = require('./login');
 const registerRouter = require('./register');
-const logoutRouter = require('./logout');
 const tokenRouter = require('./token');
+const friendsRouter = require('./friends');
+
 userRouter.use('/login', loginRouter);
 userRouter.use('/register', registerRouter);
-userRouter.use('/logout', logoutRouter);
 userRouter.use('/token', tokenRouter);
+userRouter.use('/friends', friendsRouter);
 
 module.exports = userRouter;

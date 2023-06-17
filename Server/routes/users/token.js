@@ -8,14 +8,16 @@ tokenRouter.use(express.json());
 tokenRouter.use(express.urlencoded({ extended: true }));
 
 tokenRouter.post('/verify', (req, res) => {
-    const sessionToken = req.headers['x-access-token'];
+    console.log("verifying");
+    const sessionToken = req.headers['x-auth-token'];
     if (!sessionToken) {
-        res.status(401).send('No token provided');
+        res.status(400).send('No token provided');
     } else {
         jwt.verify(sessionToken, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
                 res.status(401).send('Invalid token');
             } else {
+                res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
                 res.status(200).send('Valid token');
             }
         });
@@ -23,7 +25,7 @@ tokenRouter.post('/verify', (req, res) => {
 }); 
 
 tokenRouter.post('/renew', (req, res) => {
-    const sessionToken = req.headers['x-access-token'];
+    const sessionToken = req.headers['x-auth-token'];
     if (!sessionToken) {
         res.status(401).send('No token provided');
     }

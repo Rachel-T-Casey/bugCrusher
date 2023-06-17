@@ -3,19 +3,13 @@ import axios from 'axios'
 const validateAuthentication = async () : Promise<boolean>  => {
     const token = localStorage.getItem('x-auth-token');
     if(!token) return false;
-    await axios.post('http://localhost:5000/users/token/verify', token)
-    .then(res => {
-        if(res.data === true) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    else {
+    try { 
+        const response = await axios.post('http://localhost:5000/users/token/verify', token);
+        return response.data === true;
+    } catch(error) {
+        return true;    
     }
-    ).catch(err => {
-        console.log(err);
-        return false;
-    });
-    return true;
+    }
 }
 export default validateAuthentication;

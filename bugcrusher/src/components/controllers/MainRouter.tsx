@@ -6,13 +6,14 @@ import Feed from '../views/Feed'
 import Settings from '../views/Settings'
 import Projects from '../views/Projects'
 import Social from '../views/Social'
+import Login from '../authentication/Login'
 function MainRouter() {
 
   return (
-
     <Router> 
       <Routes>
         <Route path = "/" element = {<LoginPanel/>}/>
+        <Route path = "/login" element = {<LoginPanel/>}/>
         <Route element = {<ProtectedRoute/>}>
           <Route path = "/dashboard" element={<Dashboard/>}/>
         </Route>

@@ -92,7 +92,8 @@ registerRouter.post('/', validateInputs, (req, res) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    const token = jwt.sign({ id: result.insertId }, process.env.JWT_SECRET, {
+                    const payload = { id: result.UID, username: Username };
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, {
                         expiresIn: 86400 // expires in 24 hours
                     });
                     res.status(200).send({ auth: true, token: token });

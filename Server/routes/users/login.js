@@ -26,7 +26,8 @@ loginRouter.post('/', (req, res) => {
                     console.log('Invalid Password');
                     res.status(401).send('Invalid Password');
                 } else {
-                    const token = jwt.sign({ id: user.UserID }, process.env.JWT_SECRET, {
+                    const payload = { id: user.UID, username: user.Username };  
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, {
                         expiresIn: 86400 // expires in 24 hours
                     });
                     console.log(token);

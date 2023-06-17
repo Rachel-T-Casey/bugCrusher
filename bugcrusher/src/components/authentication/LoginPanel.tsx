@@ -6,7 +6,6 @@ import {useState, useEffect} from 'react';
 import { Navigate } from 'react-router-dom';
 import validateAuthentication from './util/validateAuthentication';
 
-
 function LoginPanel () {
     const [isLogin, setIsLogin] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,7 +15,7 @@ function LoginPanel () {
             setIsAuthenticated(res);
             setIsLoaded(true);
         })
-    })
+    }, [])
     if(!isLoaded) {
         return <div>Loading...</div>
     }

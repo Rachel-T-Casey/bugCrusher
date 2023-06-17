@@ -5,14 +5,12 @@ import "../../../styles/ProjectItems.scss";
 class Projects extends React.Component<any, {name : string, description: string, author: string}> {
 
     constructor(props : {name : string, description: string, author: string}) {
-        
         super(props);
          this.state = {
             name : props.name,
             description: props.description,
             author: props.author
         }
-
     }
     handleChange = (event : any) => {
         this.setState({name: event.target.value});

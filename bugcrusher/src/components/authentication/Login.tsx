@@ -1,22 +1,19 @@
-import React from 'react';
+import React from 'react'
 import  {useForm} from 'react-hook-form';
 import axios from 'axios';
 import { Navigate } from 'react-router-dom';
 import {useState} from 'react';
 function Login() {
   const {register, handleSubmit} = useForm();
-
     const onSubmit = (data: any) => {
         console.log(data);
         axios.post("http://localhost:5000/users/login", data)
         .then(response => {
-            const token = response.data;
+            const token = response.data.token;
             localStorage.setItem('x-auth-token', token);            
             setIsAuthenticated(true);
             console.log(response);
-
-        }
-        ).catch(error => {
+        }).catch(error => {
             console.error(error);
         })  
     }
