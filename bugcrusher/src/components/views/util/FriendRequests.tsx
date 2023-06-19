@@ -34,7 +34,7 @@ function FriendRequests() {
                         setFriendRequests(requests);
                 })
                 .catch(err => {
-
+                    console.error(err);
                 })
             }
             
