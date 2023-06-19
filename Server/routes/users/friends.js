@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const Name_To_UID = require('../../util/convertUser').Name_To_UID;
-
+const UID_To_Name = require('../../util/convertUser').UID_To_Name;
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -42,6 +42,31 @@ friendsRouter.post('/new', async (req, res) => {
     });
 });
 
+friendsRouter.get('/requests', (req, res) => {
+    const db = req.app.locals.db;
+    const token = req.headers['x-auth-token'];
+    try {
+        console.log("Fetching requests");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userID = decoded.id;
+        const sqlQuery = `SELECT * FROM FriendRequests WHERE incomingID = ?`;
+        console.log(userID);
+        db.query(sqlQuery, [userID], (err, result) => {
+            if(err) {
+                console.error(err);
+                return res.status(500).send('Internal Server Error');
+            }
+            console.log(result);
+            UID_To_Name(db, result[0].outgoingID, (name) => {
+                console.log(name);
+                return res.status(200).send(name);
+            })
+        })
+    } catch(error) {
+        console.error(error);
+        return res.status(401).send('Invalid Token');
+    }
+})
 
 friendsRouter.post('/delete', (req, res) => {
  

@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import "../../../styles/ProjectItems.scss";
 
 class Projects extends React.Component<any, {name : string, description: string, author: string}> {
-
     constructor(props : {name : string, description: string, author: string}) {
         super(props);
          this.state = {
