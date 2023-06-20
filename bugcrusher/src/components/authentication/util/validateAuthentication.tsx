@@ -8,7 +8,7 @@ const validateAuthentication = async () : Promise<boolean>  => {
         const response = await axios.post('http://localhost:5000/users/token/verify', token);
         return response.data === true;
     } catch(error) {
-        return true;    
+        return false;    
     }
     }
 }

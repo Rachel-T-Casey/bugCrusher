@@ -42,18 +42,46 @@ function FriendRequests() {
             console.log(err);
         }
     }, [])
-
+    const handleAccept = (username : string) : any =>  () => {
+        const token = localStorage.getItem('x-auth-token');
+        console.log(username);
+        const data = {username: username};
+        axios.post('http://localhost:5000/users/friends/accept', data, {headers: {"x-auth-token": token}})
+        .then(res => {
+            console.log(res);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    }
+    const handleDecline = (username : string) : any => () => {
+        console.log(username);
+        const token = localStorage.getItem('x-auth-token');
+        const data = {username: username};
+        axios.post('http://localhost:5000/users/friends/decline', data, {headers: {"x-auth-token": token}})
+        .then(res => {
+            console.log(res);
+        }) 
+        .catch(err => {
+            console.log(err);
+        })
+    }
     return (
         <div className = "FriendRequests">
             <h2> Friend Requests </h2>
             <ul>
             {
                 friendRequests.map((request: IRequests, index: number) => {
-                    return <li key = {index}>{request.username}</li>
+                    return(
+                    <li key = {index}>{request.username}
+                        <button onClick={handleAccept(request.username)}> Accept </button>
+                        <button onClick={handleDecline(request.username)}>Decline</button>
+                    </li>
+                    )
                 })
             }
             </ul>
-        </div>
+     </div>
     )
 } 
 
