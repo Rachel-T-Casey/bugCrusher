@@ -1,13 +1,18 @@
+// Start of imports
 const express = require('express');
 const cors = require('cors');
 const registerRouter = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sql = require('mysql2');
+// End of imports 
 
+// Start of setup
 registerRouter.use(cors());
 registerRouter.use(express.json());
 registerRouter.use(express.urlencoded({ extended: true }));
+
+// End of setup
 
 const validateInputs = (req, res, next) => {
     const { Username, Email, Password } = req.body;
@@ -82,20 +87,17 @@ registerRouter.post('/', validateInputs, (req, res) => {
     const { Username, Email, Password } = req.body;
     const db = req.app.locals.db;
     const saltRounds = 10;
-    console.log("Registering");
-    console.log(Username, Email, Password);
     bcrypt.hash(Password, saltRounds, (err, Hash) => {
-        if (err) {
-            console.log(err);
-        } else {
+        if (err) 
+        { console.error(err); } 
+        else {
             db.query('INSERT INTO Users (Username, Email, Password) VALUES (?, ?, ?)', [Username, Email, Hash], (err, result) => {
-                if (err) {
-                    console.log(err);
-                } else {
+                if (err) 
+                { console.error(err); } 
+                else {
                     const payload = { id: result.UID, username: Username };
-                    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-                        expiresIn: 86400 // expires in 24 hours
-                    });
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, 
+                        { expiresIn: 86400 }); // expires in 24 hours
                     res.status(200).send({ auth: true, token: token });
                 }
             })

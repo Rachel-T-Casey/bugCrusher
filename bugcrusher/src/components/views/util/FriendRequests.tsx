@@ -45,26 +45,18 @@ function FriendRequests() {
     const handleAccept = (username : string) : any =>  () => {
         const token = localStorage.getItem('x-auth-token');
         console.log(username);
-        const data = {username: username};
+        const data = {friendName: username};
         axios.post('http://localhost:5000/users/friends/accept', data, {headers: {"x-auth-token": token}})
-        .then(res => {
-            console.log(res);
-        })
-        .catch(err => {
-            console.log(err);
-        })
+        .then (res => { console.log(res); })
+        .catch(err => { console.log(err); })
     }
     const handleDecline = (username : string) : any => () => {
         console.log(username);
         const token = localStorage.getItem('x-auth-token');
-        const data = {username: username};
+        const data = {friendName: username};
         axios.post('http://localhost:5000/users/friends/decline', data, {headers: {"x-auth-token": token}})
-        .then(res => {
-            console.log(res);
-        }) 
-        .catch(err => {
-            console.log(err);
-        })
+        .then (res => { console.log(res); }) 
+        .catch(err => { console.log(err); })
     }
     return (
         <div className = "FriendRequests">

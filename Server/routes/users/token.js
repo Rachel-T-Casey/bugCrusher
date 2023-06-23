@@ -1,27 +1,31 @@
+// Imports 
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+// End imports
 
+// Setup
 const tokenRouter = express.Router();
 tokenRouter.use(cors());
 tokenRouter.use(express.json());
 tokenRouter.use(express.urlencoded({ extended: true }));
+// End setup
+
 
 tokenRouter.post('/verify', (req, res) => {
     console.log("verifying");
     const sessionToken = req.headers['x-auth-token'];
-    if (!sessionToken) {
-        res.status(400).send('No token provided');
-    } else { 
+    if (!sessionToken) 
+    { res.status(400).send('No token provided'); } 
+    else { 
         try {
-        jwt.verify(sessionToken, process.env.JWT_SECRET, (err, decoded) => {
+            jwt.verify(sessionToken, process.env.JWT_SECRET, (err, decoded) => {
             res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
             res.status(200).send('Valid token');
-        });
+            }); 
         }
-        catch (err) {   
-            res.status(401).send('Invalid token');
-       }
+        catch (err) 
+        {  res.status(401).send('Invalid token'); }
     }  
 }); 
 
@@ -40,7 +44,5 @@ tokenRouter.post('/renew', (req, res) => {
             res.status(200).send({ auth: true, token: token });
         }
     });
-
-
 });
 module.exports = tokenRouter;

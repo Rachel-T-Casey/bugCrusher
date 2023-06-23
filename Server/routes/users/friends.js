@@ -1,92 +1,139 @@
+// Desc: Router for /users/friends
+// Path: Server/routes/users/friends.js
+
+// Note: All routes in this file require a valid JWT token,
+// the router is already setup to use the ValidateUser middleware
+// to check for a valid token, s
+
+// Start imports
 const express = require('express');
 const cors = require('cors');
+
+const AUID_To_Name = require('../../util/convertUser').AUID_To_Name;
+const AName_To_UID = require('../../util/convertUser').AName_To_UID;
+const isFriend = require('../../util/isFriend');
+const isFriendRequest = require('../../util/isFriendRequest');
+const makeConnection = require('../../util/makeConnection');
 const jwt = require('jsonwebtoken');
-const Name_To_UID = require('../../util/convertUser').Name_To_UID;
-const UID_To_Name = require('../../util/convertUser').UID_To_Name;
 const dotenv = require('dotenv');
-
+// End imports
+// Start setup
 dotenv.config();
-
 const friendsRouter = express.Router();
-
 friendsRouter.use(express.json());
 friendsRouter.use(express.urlencoded({ extended: true }));
 friendsRouter.use(cors());
-
-
-friendsRouter.get('/', (req, res) => {
-    
-});
+// End setup
+// Start routes
+friendsRouter.get('/',(req, res) => {});
 friendsRouter.post('/new', async (req, res) => {
-    const db = req.app.locals.db;
     const token = req.headers['x-auth-token'];
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);  
-    } catch(error) {
-        console.log(error);
-        console.log("This token has expired");
-        return res.status(401).send('Invalid Token');
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userID = decoded.id;
     const friendName = req.body.friendName;
-    Name_To_UID(db, friendName, (result) => {
-        if(result === null) {
-            res.status(400).send('Friend not found');
-        } else {
-            const sqlQuery = `INSERT INTO FriendRequests (incomingID, outgoingID) VALUES (?, ?)`;
-            const friendID = result;
-            db.query(sqlQuery, [userID, friendID], (err, result) => {
-                if(err) {
-                    console.error(err);
-                    res.status(500).send('Internal Server Error');
-                } else {
-                    console.log(result);
-                    res.status(200).send('Friend Request Sent');
-                }
-            });
-        }
-    });
-});
-
-friendsRouter.get('/requests', (req, res) => {
-    const db = req.app.locals.db;
-    const token = req.headers['x-auth-token'];
-    try {
-        console.log("Fetching requests");
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const userID = decoded.id;
-            const sqlQuery = `SELECT * FROM FriendRequests WHERE incomingID = ?`;
-            console.log(userID);
-            db.query(sqlQuery, [userID], (err, result) => {
-                if(err) {
-                    console.error(err);
-                    return res.status(500).send('Internal Server Error');
-                }
-                console.log(result);
-                UID_To_Name(db, result[0].outgoingID, (name) => {
-                    console.log(name);
-                    return res.status(200).send(name);
-                })
-            }) 
-        } catch(error) {
-            console.log("This token has expired");
-            return res.status(401).send('Invalid Token');     
-        }
-    } catch(error) {
-        console.error(error);
-        return res.status(401).send('Invalid Token');
+    const friendUID = await AName_To_UID(friendName);
+    const db = await makeConnection();
+    const isFriendAlready = await isFriend(userID, friendUID);
+    if(isFriendAlready) {
+        db.close();
+        return res.status(400).send('Friend already added');
     }
-})
-
-friendsRouter.post('/delete', (req, res) => {
- 
-})
-friendsRouter.post('/accept', (req, res) => {
-   return res.status(200).send('Friend Request Accepted');
+    const requestedAlready = await isFriendRequest(userID, friendUID);
+    if(requestedAlready) {
+        db.close();
+        return res.status(400).send('Friend request already sent');
+    }
+    const sqlQuery = `INSERT INTO FriendRequests (outgoingID, incomingID) VALUES (?, ?)`;
+    await db.execute(sqlQuery, [userID, friendUID]);
+    db.close();
+    return res.status(200).send('Friend request sent');
 });
-
-friendsRouter.post('/decline', (req, res) => {
-    return res.status(200).send('Friend Request Declined');
+friendsRouter.get('/requests', async (req, res) => {
+    const token = req.headers['x-auth-token'];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userID = decoded.id;
+    const db = await makeConnection();
+    const sqlQuery = `SELECT * FROM FriendRequests WHERE incomingID = ?`;
+    const [rows] = await db.execute(sqlQuery, [userID]);
+    db.close();
+    const requests = [];
+    for(let i = 0; i < rows.length; i++) {
+        const friendName = await AUID_To_Name(rows[i].outgoingID);
+        requests.push(friendName);
+    }
+    return res.status(200).send(requests);
 })
+friendsRouter.post('/delete', async (req, res) => {
+    const token = req.headers['x-auth-token'];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userID = decoded.id;
+    const friendName = req.body.friendName;
+    const friendUID = await AName_To_UID(friendName);
+    const isFriendAlready = await isFriend(userID, friendUID);
+    if(!isFriendAlready) {
+        return res.status(400).send('Friend not found');
+    }
+    const db = await makeConnection();
+    const sqlQueryIsIncoming = `SELECT * FROM Friends WHERE incomingID = ? AND outgoingID = ?`;
+    const [isIncoming] = await db.execute(sqlQueryIsIncoming, [userID, friendUID]);
+    if(isIncoming.length !== 0) {
+        const sqlQueryDelete = `DELETE FROM Friends WHERE incomingID = ? AND outgoingID = ?`;
+        await db.execute(sqlQueryDelete, [userID, friendUID]);
+        db.close();
+        return res.status(200).send('Friend deleted');
+    }
+    const sqlQueryIsOutgoing = `SELECT * FROM Friends WHERE incomingID = ? AND outgoingID = ?`;
+    const [isOutgoing] = await db.execute(sqlQueryIsOutgoing, [friendUID, userID]);
+    if(isOutgoing.length !== 0) {
+        const sqlQueryDelete = `DELETE FROM Friends WHERE incomingID = ? AND outgoingID = ?`;
+        await db.execute(sqlQueryDelete, [friendUID, userID]);
+        db.close();
+        return res.status(200).send('Friend deleted');
+    }
+    db.close();
+    return res.status(400).send('Friend not found');
+    
+})
+friendsRouter.post('/accept', async (req, res) => {
+    const token = req.headers['x-auth-token'];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userID = decoded.id;
+    const friendName = req.body.friendName;
+    const friendUID = await AName_To_UID(friendName);
+    
+    if(friendUID === null) 
+    { res.status(400).send('Friend not found'); }
+    
+    const db = await makeConnection();
+    const sqlQuery = `SELECT * FROM Friends WHERE incomingID = ? AND outgoingID = ?`;
+    const [isFriends] = await db.execute(sqlQuery, [userID, friendUID]);
+    if(isFriends.length !== 0) { 
+        db.close();
+        return res.status(400).send('Friend already added'); 
+    }
+
+    const sqlQuery2 = `INSERT INTO Friends (incomingID, outgoingID) VALUES (?, ?)`;
+    await db.execute(sqlQuery2, [userID, friendUID]);
+
+    const sqlQuery3 = `DELETE FROM FriendRequests WHERE incomingID = ? AND outgoingID = ?`;
+    await db.execute(sqlQuery3, [userID, friendUID]);
+    
+    db.close();
+    return res.status(200).send('Friend added');
+    
+
+});
+friendsRouter.post('/decline', async (req, res) => {
+    const token = req.headers['x-auth-token'];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userID = decoded.id;
+    const friendName = req.body.friendName;
+    const friendUID = await AName_To_UID(friendName);
+    const db = await makeConnection();
+    const sqlQuery = `DELETE FROM FriendRequests WHERE incomingID = ? AND outgoingID = ?`;
+    await db.execute(sqlQuery, [userID, friendUID]);
+    db.close();
+    return res.status(200).send('Friend request declined');
+})
+// End routes
 module.exports = friendsRouter;
